@@ -43,10 +43,18 @@ model = genai.GenerativeModel(
 async def generate_analyze(file):
     global convo
     convo = model.start_chat()
+    is_finished = False
 
-    reply_msg = await convo.send_message_async(
-        [file]
-    )
+    while not is_finished:
+        try:
+            reply_msg = await convo.send_message_async(
+                [file]
+            )
+            is_finished = True
+        except Exception as e:
+            print(f"Error: {e}")
+            print("retrying...")
+
     return reply_msg.text + "\n\n" + "-# Reply to this message to ask follow-up questions."
 
 async def ask_followup(question):
