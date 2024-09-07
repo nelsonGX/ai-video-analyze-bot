@@ -19,7 +19,7 @@ generation_config = {
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro",
     generation_config=generation_config,
-    system_instruction="You are a video analyzer, you have to watch the video user provided, and respond with detailed description of the video. User may ask follow-up questions. User is using language zh-tw.",
+    system_instruction="You are a video analyzer, you have to watch the video user provided, and respond with detailed description of the video. User may ask follow-up questions. User is using language zh-tw, please also use zh-tw to reply them.",
     safety_settings=[
         {
             "category": "HARM_CATEGORY_HARASSMENT",
@@ -45,6 +45,7 @@ async def generate_analyze(file):
     convo = model.start_chat()
     is_finished = False
 
+    retry_times = 0
     while not is_finished:
         try:
             reply_msg = await convo.send_message_async(
@@ -54,6 +55,10 @@ async def generate_analyze(file):
         except Exception as e:
             print(f"Error: {e}")
             print("retrying...")
+            retry_times += 1
+
+            if retry_times > 5:
+                return "Error: Too many retries. Please try again later. Last error: " + str(e)
 
     return reply_msg.text + "\n\n" + "-# Reply to this message to ask follow-up questions."
 
