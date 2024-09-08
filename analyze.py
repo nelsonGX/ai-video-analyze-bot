@@ -1,5 +1,6 @@
 from load_config import gemini_api_key
 import google.generativeai as genai
+import asyncio
 
 genai.configure(api_key=gemini_api_key)
 
@@ -56,6 +57,7 @@ async def generate_analyze(file):
             print(f"Error: {e}")
             print("retrying...")
             retry_times += 1
+            asyncio.sleep(1)
 
             if retry_times > 5:
                 return "Error: Too many retries. Please try again later. Last error: " + str(e)
@@ -64,7 +66,21 @@ async def generate_analyze(file):
 
 async def ask_followup(question):
     global convo
-    reply_msg = await convo.send_message_async(
-        question
-    )
+
+    retry_times = 0
+    is_finished = False
+    while not is_finished:
+        try:
+            reply_msg = await convo.send_message_async(
+                question
+            )
+            is_finished = True
+        except Exception as e:
+            print(f"Error: {e}")
+            print("retrying...")
+            retry_times += 1
+            asyncio.sleep(1)
+
+            if retry_times > 5:
+                return "Error: Too many retries. Please try again later. Last error: " + str(e)
     return reply_msg.text
