@@ -8,3 +8,5 @@ example for windows:
 3. Install dependencies
 4. Rename .env.example to .env and fill in API keys
 5. run it! `python3 bot.py`
+# Demo
+https://github.com/user-attachments/assets/76487768-fd76-4fac-a9c4-e0f03f552647
